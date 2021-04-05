@@ -4,7 +4,6 @@ import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
 import de.srsuders.levelsystem.game.LevelPlayer;
-import de.srsuders.levelsystem.storage.Data;
 
 /**
  * Author: SrSuders aka. Mario-Angelo Date: 05.04.2021 Project: levelsystem
@@ -18,14 +17,12 @@ public class LevelPlayerChangeExpEvent extends Event {
 	private boolean doLevelUp;
 	private float newExpValue;
 
-	public LevelPlayerChangeExpEvent(final LevelPlayer levelPlayer, final float oldExpValue, final float newExpValue) {
+	public LevelPlayerChangeExpEvent(final LevelPlayer levelPlayer, final float oldExpValue, final float newExpValue,
+			final boolean lvlup) {
 		this.oldExpValue = oldExpValue;
 		this.newExpValue = newExpValue;
 		this.levelPlayer = levelPlayer;
-		this.doLevelUp = Data.getInstance().getExpHandler().doesLevelUp(newExpValue, levelPlayer.getLevel());
-		if (doLevelUp)
-			Data.getInstance().getLevelSystem().getServer().getPluginManager()
-					.callEvent(new LevelPlayerLevelUpEvent(levelPlayer));
+		this.doLevelUp = lvlup;
 		levelPlayer.updateExpTask();
 	}
 

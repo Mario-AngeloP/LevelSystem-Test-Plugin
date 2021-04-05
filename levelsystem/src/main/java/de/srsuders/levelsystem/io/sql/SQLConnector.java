@@ -5,7 +5,6 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
@@ -118,8 +117,8 @@ public class SQLConnector {
 
 	private void evaluateConnection() {
 		try {
-			if (((Statement) sqlData).getConnection() == null || !((Statement) sqlData).getConnection().isValid(10)
-					|| ((Statement) sqlData).getConnection().isClosed())
+			if (sqlData.getConnection() == null || !sqlData.getConnection().isValid(10)
+					|| sqlData.getConnection().isClosed())
 				connect();
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -128,8 +127,8 @@ public class SQLConnector {
 
 	public void disconnect() {
 		try {
-			if (((Statement) sqlData).getConnection() != null) {
-				((Statement) sqlData).getConnection().close();
+			if (sqlData.getConnection() != null) {
+				sqlData.getConnection().close();
 			}
 		} catch (final SQLException ex) {
 			getLogger().log(Level.SEVERE, "Die MySQL Verbindung konnte nicht aufgebaut werden.", ex);

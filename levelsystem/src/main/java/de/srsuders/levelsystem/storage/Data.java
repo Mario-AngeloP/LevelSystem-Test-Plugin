@@ -4,9 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import de.srsuders.levelsystem.LevelSystem;
 import de.srsuders.levelsystem.handler.ExpHandler;
 import de.srsuders.levelsystem.io.sql.SQLManager;
+import de.srsuders.levelsystem.main.LevelSystem;
 
 /**
  * Author: SrSuders aka. Mario-Angelo Date: 05.04.2021 Project: levelsystem
@@ -15,20 +15,23 @@ import de.srsuders.levelsystem.io.sql.SQLManager;
 public class Data {
 
 	private static Data instance;
-	private final LevelSystem ls;
+	private LevelSystem ls;
 	private final SQLManager sql;
 	private final ExpHandler expHandler;
 	private final Map<UUID, String> cache;
-	
+
 	private Data() {
 		this.cache = new HashMap<>();
-		this.ls = new LevelSystem();
 		this.sql = new SQLManager();
 		this.expHandler = new ExpHandler();
 	}
 
 	public ExpHandler getExpHandler() {
 		return this.expHandler;
+	}
+
+	public void setLevelSystemInstance(LevelSystem instance) {
+		this.ls = instance;
 	}
 
 	public LevelSystem getLevelSystem() {

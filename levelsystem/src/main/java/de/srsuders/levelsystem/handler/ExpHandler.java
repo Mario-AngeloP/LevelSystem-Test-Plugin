@@ -37,23 +37,12 @@ public class ExpHandler {
 		return 0;
 	}
 
-	/**
-	 * Gibt die benötigten Exp fürs nächste Level wieder
-	 * 
-	 * @param exp
-	 * @return
-	 */
-	public Long getLeftExpForNextLevel(long exp) {
-		final int lvl = detectLevelByExp(exp);
-		return expMap.get(lvl + 1) - exp;
-	}
-
 	public Integer getFirstLevel() {
 		return (Integer) expMap.keySet().toArray()[0];
 	}
 
 	public Integer getLastLevel() {
-		return (Integer) expMap.keySet().toArray()[expMap.keySet().toArray().length - 1];
+		return (Integer) expMap.keySet().toArray()[expMap.keySet().toArray().length - 1] - 1;
 	}
 
 	/**

@@ -5,6 +5,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 
 import de.srsuders.levelsystem.game.LevelPlayer;
 import de.srsuders.levelsystem.handler.LevelPlayerHandler;
@@ -18,11 +20,16 @@ public class PlayerListener implements Listener {
 	@EventHandler
 	public void onJoin(final PlayerJoinEvent e) {
 		final Player p = e.getPlayer();
-		if(!Data.getInstance().getCache().containsKey(p.getUniqueId())) 
+		if (!Data.getInstance().getCache().containsKey(p.getUniqueId()))
 			Data.getInstance().getCache().put(p.getUniqueId(), p.getName());
 		final LevelPlayer lp = LevelPlayerHandler.getLevelPlayer(p);
 
 		lp.updateExpTask();
+	}
+
+	@EventHandler
+	public void onLeave(final PlayerQuitEvent e) {
+		LevelPlayerHandler.getLevelPlayer(e.getPlayer()).savePlayer();
 	}
 
 	// Entfernt 5% Exp des Spielers
@@ -33,5 +40,10 @@ public class PlayerListener implements Listener {
 		final long l = (long) ((Data.getInstance().getExpHandler().getExpOfLevel(lp.getLevel())
 				- Data.getInstance().getExpHandler().getExpOfLevel(lp.getLevel() - 1)) * 0.05);
 		lp.removeExp(l);
+	}
+
+	@EventHandler
+	public void onRespawn(final PlayerRespawnEvent e) {
+		LevelPlayerHandler.getLevelPlayer(e.getPlayer()).updateExpTask();
 	}
 }

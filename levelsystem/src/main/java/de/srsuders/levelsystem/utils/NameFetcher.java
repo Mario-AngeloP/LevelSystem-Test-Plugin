@@ -17,58 +17,59 @@ import de.srsuders.levelsystem.io.IOUtils;
  * Author: SrSuders aka. Mario-Angelo Date: 05.04.2021 Project: levelsystem
  */
 final class NameFetcher {
-  /**
-   * @param playerName The name of the player
-   * @return The UUID of the given player
-   */
-  static UUID getUUID(String playerName) {
-    final String url = "https://api.mojang.com/users/profiles/minecraft/" + playerName;
-    try {
-      final String uuidJson = callURL(url);
-      if (!uuidJson.isEmpty()) {
-        final JSONObject uuidObject = (JSONObject) JSONValue.parseWithException(uuidJson);
-        return UUID.fromString(uuidObject.get("id").toString().replaceFirst( 
-            "(\\p{XDigit}{8})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}+)", "$1-$2-$3-$4-$5"));
-      }
+	/**
+	 * @param playerName The name of the player
+	 * @return The UUID of the given player
+	 */
+	static UUID getUUID(String playerName) {
+		final String url = "https://api.mojang.com/users/profiles/minecraft/" + playerName;
+		try {
+			final String uuidJson = callURL(url);
+			if (!uuidJson.isEmpty()) {
+				final JSONObject uuidObject = (JSONObject) JSONValue.parseWithException(uuidJson);
+				return UUID.fromString(uuidObject.get("id").toString().replaceFirst(
+						"(\\p{XDigit}{8})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}+)",
+						"$1-$2-$3-$4-$5"));
+			}
 
-    } catch (ParseException ex) {
-      ex.printStackTrace();
-    }
+		} catch (ParseException ex) {
+			ex.printStackTrace();
+		}
 
-    return null;
-  }
-  
-  /**
-   * @param uuid The UUID of a player (can be trimmed or the normal version)
-   * @return The name of the given player
-   */
-  static String getName(UUID uuid) {
-    final String url = "https://api.mojang.com/user/profiles/" + uuid.toString().replace("-", "") + "/names";
-    try {
-      final String nameJson = callURL(url);
-      final JSONArray nameValue = (JSONArray) JSONValue.parseWithException(nameJson);
-      final String playerSlot = nameValue.get(nameValue.size() - 1).toString();
-      final JSONObject nameObject = (JSONObject) JSONValue.parseWithException(playerSlot);
-      return nameObject.get("name").toString();
-    } catch (ParseException ex) {
-    	ex.printStackTrace();
-    }
-    return "error";
-  }
+		return null;
+	}
 
-  private static String callURL(String urlString) {
-    final StringBuilder builder = new StringBuilder();
-    try {
-      final URL url = new URL(urlString);
-      final URLConnection connection = url.openConnection();
-      connection.setReadTimeout(60 * 1000);
-      IOUtils.readURL(builder, connection);
-    } catch (FileNotFoundException ignored) {
-    } catch (IOException ex) {
-    	ex.printStackTrace();
-    }
+	/**
+	 * @param uuid The UUID of a player (can be trimmed or the normal version)
+	 * @return The name of the given player
+	 */
+	static String getName(UUID uuid) {
+		final String url = "https://api.mojang.com/user/profiles/" + uuid.toString().replace("-", "") + "/names";
+		try {
+			final String nameJson = callURL(url);
+			final JSONArray nameValue = (JSONArray) JSONValue.parseWithException(nameJson);
+			final String playerSlot = nameValue.get(nameValue.size() - 1).toString();
+			final JSONObject nameObject = (JSONObject) JSONValue.parseWithException(playerSlot);
+			return nameObject.get("name").toString();
+		} catch (ParseException ex) {
+			ex.printStackTrace();
+		}
+		return "error";
+	}
 
-    return builder.toString();
-  }
+	private static String callURL(String urlString) {
+		final StringBuilder builder = new StringBuilder();
+		try {
+			final URL url = new URL(urlString);
+			final URLConnection connection = url.openConnection();
+			connection.setReadTimeout(60 * 1000);
+			IOUtils.readURL(builder, connection);
+		} catch (FileNotFoundException ignored) {
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		}
+
+		return builder.toString();
+	}
 
 }

@@ -1,6 +1,6 @@
-name: LevelSystem
+name: LevelSystemTest
 version: 1.0
 author: SrSuders
-main: de.srsuders.levelsystem.LevelSystem
+main: de.srsuders.levelsystem.main.LevelSystem
 commands:
   level:

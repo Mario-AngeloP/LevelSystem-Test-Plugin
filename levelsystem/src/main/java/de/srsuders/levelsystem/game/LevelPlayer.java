@@ -8,6 +8,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import de.srsuders.levelsystem.event.LevelPlayerChangeExpEvent;
+import de.srsuders.levelsystem.event.LevelPlayerLevelUpEvent;
 import de.srsuders.levelsystem.io.sql.SQLManager;
 import de.srsuders.levelsystem.storage.Const;
 import de.srsuders.levelsystem.storage.Data;
@@ -41,18 +42,25 @@ public class LevelPlayer {
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	public void updateExpTask() {
 		final Player player = Bukkit.getPlayer(uuid);
 		if (player != null) {
-			player.setLevel(lvl);
-			if(this.lvl == Data.getInstance().getExpHandler().getLastLevel()) {
-				player.setExp(0.99F);
+			Bukkit.getScheduler().scheduleAsyncDelayedTask(Data.getInstance().getLevelSystem(), new Runnable() {
+				@Override
+				public void run() {
+					player.setLevel(lvl);
+				}
+			}, 1L);
+			if (this.lvl == Data.getInstance().getExpHandler().getLastLevel())
 				return;
-			}
-			final double result = ((this.exp * 100) / Data.getInstance().getExpHandler().getExpOfLevel(lvl)) / 100;
-			if (result < 100)
-				player.setExp((float) result);
-			
+			final float lastLvlExp = this.lvl == 1 ? 0 : Data.getInstance().getExpHandler().getExpOfLevel(lvl - 1);
+			final float result = ((((float) this.exp) - lastLvlExp)
+					/ ((float) Data.getInstance().getExpHandler().getExpOfLevel(lvl) - (float) lastLvlExp));
+			if (result >= 1)
+				player.setExp(0.99F);
+			else
+				player.setExp(result);
 		}
 	}
 
@@ -63,11 +71,23 @@ public class LevelPlayer {
 	 * @param exp
 	 */
 	public void addExp(long exp) {
+		if (this.lvl == Data.getInstance().getExpHandler().getLastLevel())
+			return;
 		this.exp += exp;
-		if (Data.getInstance().getExpHandler().doesLevelUp(this.exp, lvl))
-			this.lvl++;
+		int oldLvl = this.lvl;
+		if (Data.getInstance().getExpHandler().doesLevelUp(this.exp, lvl)) {
+			while (doesLevelUp()) {
+				this.lvl++;
+				Data.getInstance().getLevelSystem().getServer().getPluginManager()
+						.callEvent(new LevelPlayerLevelUpEvent(this));
+				if (this.lvl == Data.getInstance().getExpHandler().getLastLevel()) {
+					this.exp = Data.getInstance().getExpHandler().getExpOfLevel(lvl);
+					break;
+				}
+			}
+		}
 		Data.getInstance().getLevelSystem().getServer().getPluginManager()
-				.callEvent(new LevelPlayerChangeExpEvent(this, this.exp - exp, this.exp));
+				.callEvent(new LevelPlayerChangeExpEvent(this, this.exp - exp, this.exp, oldLvl != this.lvl));
 		updateExpTask();
 	}
 
@@ -79,20 +99,26 @@ public class LevelPlayer {
 	 */
 	public void removeExp(long exp) {
 		final long oldExp = this.exp;
-		if(lvl == 1 & (this.exp - exp) < 0) {
+		if (lvl == 1 & (this.exp - exp) < 0) {
 			this.exp = 0L;
 			Data.getInstance().getLevelSystem().getServer().getPluginManager()
-			.callEvent(new LevelPlayerChangeExpEvent(this, oldExp, this.exp));
+					.callEvent(new LevelPlayerChangeExpEvent(this, oldExp, this.exp, false));
 			return;
 		}
+		final long newExp = this.exp -= exp;
 		final long lowerExp = Data.getInstance().getExpHandler().getExpOfLevel(lvl - 1);
-		if ((this.exp - exp) < lowerExp) {
+		if (newExp < lowerExp) {
 			this.exp = lowerExp;
 		} else {
 			this.exp -= exp;
 		}
 		Data.getInstance().getLevelSystem().getServer().getPluginManager()
-				.callEvent(new LevelPlayerChangeExpEvent(this, oldExp, this.exp));
+				.callEvent(new LevelPlayerChangeExpEvent(this, oldExp, this.exp, false));
+		updateExpTask();
+	}
+
+	private boolean doesLevelUp() {
+		return Data.getInstance().getExpHandler().getExpOfLevel(this.lvl) <= this.exp;
 	}
 
 	public void savePlayer() {

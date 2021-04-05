@@ -14,6 +14,6 @@ public class Const {
 			+ File.separator + "expList.properties");
 
 	// Tables
-	public static final String PLAYERTABLE = "levelsystem.playertable";
+	public static final String PLAYERTABLE = "srsuderstestdb.playertable";
 
 }
