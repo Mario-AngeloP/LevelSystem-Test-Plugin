@@ -23,9 +23,10 @@ public class LevelPlayerChangeExpEvent extends Event {
 		this.newExpValue = newExpValue;
 		this.levelPlayer = levelPlayer;
 		this.doLevelUp = Data.getInstance().getExpHandler().doesLevelUp(newExpValue, levelPlayer.getLevel());
-		if (doLevelUp) 
+		if (doLevelUp)
 			Data.getInstance().getLevelSystem().getServer().getPluginManager()
 					.callEvent(new LevelPlayerLevelUpEvent(levelPlayer));
+		levelPlayer.updateExpTask();
 	}
 
 	public boolean doesLevelUp() {

@@ -15,7 +15,8 @@ public class LevelPlayerHandler {
 
 	private static final Map<UUID, LevelPlayer> lp = new HashMap<>();
 
-	private LevelPlayerHandler() {}
+	private LevelPlayerHandler() {
+	}
 
 	public static LevelPlayer getLevelPlayer(final UUID uuid) {
 		LevelPlayer lvlp;

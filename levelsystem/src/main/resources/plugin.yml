@@ -1,0 +1,6 @@
+name: LevelSystem
+version: 1.0
+author: SrSuders
+main: de.srsuders.levelsystem.LevelSystem
+commands:
+  level:

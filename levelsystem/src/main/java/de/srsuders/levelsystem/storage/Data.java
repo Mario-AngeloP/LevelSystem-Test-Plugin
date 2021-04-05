@@ -1,5 +1,9 @@
 package de.srsuders.levelsystem.storage;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
 import de.srsuders.levelsystem.LevelSystem;
 import de.srsuders.levelsystem.handler.ExpHandler;
 import de.srsuders.levelsystem.io.sql.SQLManager;
@@ -11,11 +15,13 @@ import de.srsuders.levelsystem.io.sql.SQLManager;
 public class Data {
 
 	private static Data instance;
-	private LevelSystem ls;
-	private SQLManager sql;
-	private ExpHandler expHandler;
-
+	private final LevelSystem ls;
+	private final SQLManager sql;
+	private final ExpHandler expHandler;
+	private final Map<UUID, String> cache;
+	
 	private Data() {
+		this.cache = new HashMap<>();
 		this.ls = new LevelSystem();
 		this.sql = new SQLManager();
 		this.expHandler = new ExpHandler();
@@ -38,5 +44,9 @@ public class Data {
 			instance = new Data();
 		}
 		return instance;
+	}
+
+	public Map<UUID, String> getCache() {
+		return this.cache;
 	}
 }
